@@ -6,6 +6,19 @@
 #define PLAYER1 B010101
 #define PLAYER2 B101010
 
+#define WHITE_BG 60
+#define RED_BG 61
+#define GREEN_BG 62
+
+#define LEFT_RIGHT 100
+#define RIGHT_LEFT 101
+#define LEFTCOL 200
+#define MIDCOL 201
+#define RIGHTCOL 202
+#define TOPROW 250
+#define MIDROW 251
+#define BOTROW 252
+
 int RECV_PIN = 4;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
@@ -38,6 +51,7 @@ void loop() {
           //Puts the two bits representing a player to the column position corresponding to the button pressed
           taken[0] |= player << 4;
           // switches who's turn it is
+		  Serial.write(if (player == 1){1}else{11});
           player ^= 3;
           turns++;
         }break;
@@ -46,6 +60,7 @@ void loop() {
       case 0xff18e7:
         if (!(taken[0] & MASK2) ){
           taken[0] |= player << 2;
+		  Serial.write(if (player == 1){2}else{12});
           player ^= 3;
           turns++;
         }break;
@@ -54,6 +69,7 @@ void loop() {
       case 0xff7a85:      
         if (!(taken[0] & MASK3) ){
           taken[0] |= player;
+		  Serial.write(if (player == 1){3}else{13});
           player ^= 3;
           turns++;
         }break;
@@ -62,6 +78,7 @@ void loop() {
       case 0xff10ef:
         if (!(taken[1] & MASK1) ){
           taken[1] |= player << 4;
+		  Serial.write(if (player == 1){4}else{14});
           player ^= 3;
           turns++;
         }break;
@@ -70,6 +87,7 @@ void loop() {
       case 0xff38c7:
         if (!(taken[1] & MASK2) ){
           taken[1] |= player << 2;
+		  Serial.write(if (player == 1){5}else{15});
           player ^= 3;
           turns++;
         }break;
@@ -78,6 +96,7 @@ void loop() {
       case 0xff5aa5:
         if (!(taken[1] & MASK3) ){
           taken[1] |= player;
+		  Serial.write(if (player == 1){6}else{16});
           player ^= 3;
           turns++;
         }break;
@@ -86,6 +105,7 @@ void loop() {
       case 0xff42bd:
         if (!(taken[2] & MASK1) ){
           taken[2] |= player << 4;
+		  Serial.write(if (player == 1){7}else{17});
           player ^= 3;
           turns++;
         }break;
@@ -94,6 +114,7 @@ void loop() {
       case 0xff4ab5:
         if (!(taken[2] & MASK2) ){
           taken[2] |= player << 2;
+		  Serial.write(if (player == 1){8}else{18});
           player ^= 3;
           turns++;
         }break;
@@ -102,6 +123,7 @@ void loop() {
       case 0xff52ad:
         if (!(taken[2] & MASK3) ){
           taken[2] |= player;
+		  Serial.write(if (player == 1){9}else{19});
           player ^= 3;
           turns++;
         }break;
@@ -147,10 +169,12 @@ void check(){
     //checks if a player one on a row
     if(taken[i] == PLAYER1){
         PORTB= PLAYER1; 
+		Serial.write(if i == 0) {TOPROW}else if (if i == 1){MIDROW}else{BOTROW});
         win();         
       }
     else if(taken[i] == PLAYER2){  
-        PORTB= PLAYER2; 
+        PORTB= PLAYER2;
+		Serial.write(if i == 0) {TOPROW}else if (if i == 1){MIDROW}else{BOTROW});		
         win();        
       } 
   }
@@ -171,10 +195,12 @@ void check(){
 
    //checks if a player one on a diagonal
    if(leftdiagonal == PLAYER1 || rightdiagonal == PLAYER1){
-      PORTB = PLAYER1; 
+      PORTB = PLAYER1;
+	  Serial.write(if (leftdiagonal == PLAYER1){LEFT_RIGHT}else{RIGHT_LEFT});
       win();
    }else if(leftdiagonal == PLAYER2 || rightdiagonal == PLAYER2){
       PORTB = PLAYER2; 
+	  Serial.write(if (leftdiagonal == PLAYER1){LEFT_RIGHT}else{RIGHT_LEFT});
       win();
    }
 
