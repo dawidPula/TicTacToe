@@ -7,17 +7,22 @@
 #define PLAYER2 B101010
 
 #define WHITE_BG 60
-#define RED_BG 61
-#define GREEN_BG 62
-
-#define LEFT_RIGHT 100
-#define RIGHT_LEFT 101
-#define LEFTCOL 200
-#define MIDCOL 201
-#define RIGHTCOL 202
-#define TOPROW 250
-#define MIDROW 251
-#define BOTROW 252
+#define LEFT_RIGHTG 120
+#define LEFT_RIGHTR 130
+#define RIGHT_LEFTG 121
+#define RIGHT_LEFTR 131
+#define LEFTCOLG 220
+#define LEFTCOLR 230
+#define MIDCOLG 221
+#define MIDCOLR 231
+#define RIGHTCOLG 222
+#define RIGHTCOLR 232
+#define TOPROWG 270
+#define TOPROWR 280
+#define MIDROWG 271
+#define MIDROWR 281
+#define BOTROWG 272
+#define BOTROWR 282
 
 int RECV_PIN = 4;
 IRrecv irrecv(RECV_PIN);
@@ -169,12 +174,12 @@ void check(){
     //checks if a player one on a row
     if(taken[i] == PLAYER1){
         PORTB= PLAYER1; 
-		Serial.write(if i == 0) {TOPROW}else if (if i == 1){MIDROW}else{BOTROW});
+		Serial.write(if i == 0) {TOPROWG}else if (if i == 1){MIDROWG}else{BOTROWG});
         win();         
       }
     else if(taken[i] == PLAYER2){  
         PORTB= PLAYER2;
-		Serial.write(if i == 0) {TOPROW}else if (if i == 1){MIDROW}else{BOTROW});		
+		Serial.write(if i == 0) {TOPROWR}else if (if i == 1){MIDROWR}else{BOTROWR});		
         win();        
       } 
   }
@@ -196,17 +201,18 @@ void check(){
    //checks if a player one on a diagonal
    if(leftdiagonal == PLAYER1 || rightdiagonal == PLAYER1){
       PORTB = PLAYER1;
-	  Serial.write(if (leftdiagonal == PLAYER1){LEFT_RIGHT}else{RIGHT_LEFT});
+	  Serial.write(if (leftdiagonal == PLAYER1){LEFT_RIGHTG}else{RIGHT_LEFTG});
       win();
    }else if(leftdiagonal == PLAYER2 || rightdiagonal == PLAYER2){
       PORTB = PLAYER2; 
-	  Serial.write(if (leftdiagonal == PLAYER1){LEFT_RIGHT}else{RIGHT_LEFT});
+	  Serial.write(if (leftdiagonal == PLAYER1){LEFT_RIGHTR}else{RIGHT_LEFTR});
       win();
    }
 
    // checks if there has been a draw
    if ( turns == 9){
-      PORTB= B111111; 
+      PORTB= B111111;
+      Serial.write(WHITE_BG)
       win();
     }
 }
