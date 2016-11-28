@@ -69,7 +69,7 @@ int fillSquare(int s){
   return s;
 } 
 
-void win(int w){
+int win(int w){
   stroke(0,0, 0);
   strokeWeight(10);
   switch(w){
@@ -106,13 +106,13 @@ void win(int w){
     case 282: line(150,100,450,100); /* ���   */
               return w-252;
   }
+  return 0;
 } 
 
 void draw(){
   while (myPort.available()>0){
     int val = myPort.read();
-    win(fillSquare(val));
-    redraw(val)
+    redraw(win(fillSquare(val)));
     println(val);
   }
 }
