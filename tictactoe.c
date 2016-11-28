@@ -1,4 +1,5 @@
 #include <IRremote.h>
+#include <EEPROM.h>
 
 #define MASK1 B110000
 #define MASK2 B001100
@@ -9,7 +10,7 @@
 int RECV_PIN = 4;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
-byte player = 1;
+int player = 1;
 byte taken[3];
 byte masks[3] = {MASK1,MASK2,MASK3};
 byte turns;
@@ -17,19 +18,23 @@ byte turns;
 void setup()
 {
   Serial.begin(9600);
+  Serial.print("Player one won : ");
+  Serial.println(EEPROM.read(1));
+  Serial.print("Player two won : ");
+  Serial.println(EEPROM.read(2));
   irrecv.enableIRIn();
-  // Sets pins 3,5,6 and 7 to output mode
+  // Sets pins 3,5,6 and 7 to input mode
   DDRD |= B11101000;
   //Pins 5,6, and 7  represent each row's ground
   //initially set to High so no rows light up
   PORTD |= B11100000;
-  // Sets pins 8,9,10,11,12,13 to output mode
+  // Sets pins 8,9,10,11,12,13 to input mode
   DDRB |= B111111;
+
 }
 
 void loop() {
   if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
     switch(results.value){
       //button 1 was pressed
       case 0xff30cf:
@@ -129,7 +134,6 @@ void loop() {
 }
 
 void check(){
-  Serial.println(turns);
   int columns = B111111;
   byte leftdiagonal = 0;
   byte rightdiagonal = 0;
@@ -145,13 +149,11 @@ void check(){
     rightdiagonal |= taken[i] & masks[2-i];
 
     //checks if a player one on a row
-    if(taken[i] == PLAYER1){
-        PORTB= PLAYER1; 
-        win();         
+    if(taken[i] == PLAYER1){ 
+        win(PLAYER1);         
       }
-    else if(taken[i] == PLAYER2){  
-        PORTB= PLAYER2; 
-        win();        
+    else if(taken[i] == PLAYER2){ 
+        win(PLAYER2);        
       } 
   }
   
@@ -160,38 +162,35 @@ void check(){
       // log(columns)/log(2) (i.e. log to the base 2) gets the index of the 1 bit in columns
       // if it's even Player 1 wins, if odd Player 2 wins 
       if( ((int)(log(columns)/log(2)) %2) ==  0 ){
-          PORTB= PLAYER1; 
-          win();
+          win(PLAYER1);
        }else {
-          Serial.println("Player Two");
-          PORTB = PLAYER2;
-          win();
+          win(PLAYER2);
        }
    }
 
    //checks if a player one on a diagonal
    if(leftdiagonal == PLAYER1 || rightdiagonal == PLAYER1){
-      PORTB = PLAYER1; 
-      win();
-   }else if(leftdiagonal == PLAYER2 || rightdiagonal == PLAYER2){
-      PORTB = PLAYER2; 
-      win();
-   }
+      win(PLAYER1);
+    }else if(leftdiagonal == PLAYER2 || rightdiagonal == PLAYER2){ 
+      win(PLAYER2);
+      }
 
    // checks if there has been a draw
    if ( turns == 9){
-      PORTB= B111111; 
-      win();
+      win(B111111);
     }
 }
 
-void win(){ 
+void win( byte winner){ 
+      PORTB = winner;
       delay(50);
       for (int i =0; i < 10; i++){
         PORTD |= B00001000;
         delay(200);
         PORTD ^= B11101000;
       }
+      if (winner != B111111);
+        EEPROM.write(player ^ 3, EEPROM.read(player ^ 3) + 1);
       reset();
 }
 void reset(){
@@ -201,5 +200,9 @@ void reset(){
   }
   turns = 0;
   player = 1;
+  Serial.print("Player one won : ");
+  Serial.println(EEPROM.read(1));
+  Serial.print("Player two won : ");
+  Serial.println(EEPROM.read(2));
 
 }
